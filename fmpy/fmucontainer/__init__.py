@@ -70,85 +70,6 @@ def create_fmu_container(configuration, output_filename):
     }
 
     component_map = {}
-#     vi = 0  # variable index
-#
-#     mv = ''
-#     mo = ''
-#
-#     for i, component in enumerate(configuration['components']):
-#         model_description = read_model_description(component['filename'])
-#         model_identifier = model_description.coSimulation.modelIdentifier
-#         extract(component['filename'], os.path.join(unzipdir, 'resources', model_identifier))
-#         variables = dict((v.name, v) for v in model_description.modelVariables)
-#         component_map[component['name']] = (i, variables)
-#         data['components'].append({
-#             'name': component['name'],
-#             'guid': model_description.guid,
-#             'modelIdentifier': model_identifier,
-#         })
-#         for name in component['variables']:
-#             v = variables[name]
-#             data['variables'].append({'component': i, 'valueReference': v.valueReference})
-#             name = component['name'] + '.' + v.name
-#             description = v.description
-#             if name in configuration['variables']:
-#                 mapping = configuration['variables'][name]
-#                 if 'name' in mapping:
-#                     name = mapping['name']
-#                 if 'description' in mapping:
-#                     description = mapping['description']
-#             description = ' description="%s"' % xml_encode(description) if description else ''
-#
-#             # model variables
-#             mv += f'    <ScalarVariable name="{ xml_encode(name) }" valueReference="{ vi }" causality="{ v.causality }" variability="{ v.variability }"{ description }>\n'
-#             mv += f'      <{v.type}'
-#             if v.start:
-#                 mv += f' start="{v.start}"'
-#             mv += f'/>\n'
-#             mv += f'    </ScalarVariable>\n'
-#
-#             # model structure
-#             if v.causality == 'output':
-#                 mo += f'      <Unknown index="{ vi + 1 }"/>\n'
-#
-#             vi += 1
-#
-#     xml = f'''<?xml version="1.0" encoding="UTF-8"?>
-# <fmiModelDescription
-#   fmiVersion="2.0"
-#   modelName="{ model_name }"
-#   guid=""
-#   description="{ configuration.get('description', '') }"
-#   generationTool="FMPy {fmpy.__version__} FMU Container"
-#   generationDateAndTime="{ datetime.now(pytz.utc).isoformat() }">
-#
-#   <CoSimulation modelIdentifier="FMUContainer">
-#     <SourceFiles>
-#       <File name="FMUContainer.c"/>
-#       <File name="mpack.c"/>
-#     </SourceFiles>
-#   </CoSimulation>
-#
-#   <ModelVariables>
-# { mv }  </ModelVariables>
-#
-#   <ModelStructure>
-# '''
-#
-#     if mo:
-#         xml += '    <Outputs>\n'
-#         xml += mo
-#         xml += '    </Outputs>\n'
-#         xml += '    <InitialUnknowns>\n'
-#         xml += mo
-#         xml += '    </InitialUnknowns>'
-#
-#     xml += '''
-#   </ModelStructure>
-#
-# </fmiModelDescription>
-# '''
-#
 
     for i, component in enumerate(configuration['components']):
         model_description = read_model_description(component['filename'])
@@ -161,51 +82,11 @@ def create_fmu_container(configuration, output_filename):
             'guid': model_description.guid,
             'modelIdentifier': model_identifier,
         })
-    #         for name in component['variables']:
-    #             v = variables[name]
-    #             data['variables'].append({'component': i, 'valueReference': v.valueReference})
-    #             name = component['name'] + '.' + v.name
-    #             description = v.description
-    #             if name in configuration['variables']:
-    #                 mapping = configuration['variables'][name]
-    #                 if 'name' in mapping:
-    #                     name = mapping['name']
-    #                 if 'description' in mapping:
-    #                     description = mapping['description']
-    #             description = ' description="%s"' % xml_encode(description) if description else ''
-    #
-    #             # model variables
-    #             mv += f'    <ScalarVariable name="{ xml_encode(name) }" valueReference="{ vi }" causality="{ v.causality }" variability="{ v.variability }"{ description }>\n'
-    #             mv += f'      <{v.type}'
-    #             if v.start:
-    #                 mv += f' start="{v.start}"'
-    #             mv += f'/>\n'
-    #             mv += f'    </ScalarVariable>\n'
-    #
-    #             # model structure
-    #             if v.causality == 'output':
-    #                 mo += f'      <Unknown index="{ vi + 1 }"/>\n'
-    #
-    #             vi += 1
 
     variables_map = {}
 
     for i, v in enumerate(configuration['variables']):
         variables_map[v.name] = (i, v)
-
-
-
-    # for c in configuration['connections']:
-    #
-    #     if c.startElement is None:  # input
-    #         ci, cv = component_map[c.endElement]
-    #         v = cv[c.endConnector]
-    #         data['variables'].append({'component': ci, 'valueReference': v.valueReference})
-    #
-    #     if c.endElement is None:  # output
-    #         ci, cv = component_map[c.endElement]
-    #         v = cv[c.endConnector]
-    #         data['variables'].append({'component': ci, 'valueReference': v.valueReference})
 
     mv = ''  # model variables
     mo = ''  # model outputs

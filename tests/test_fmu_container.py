@@ -18,7 +18,7 @@ class FMUContainerTest(unittest.TestCase):
             # description of the container
             'description': 'A controlled drivetrain',
 
-            # optional dictionary to customize attributes of exposed variables
+            # variables of the container
             'variables':
                 [
                     Variable('Real', 'tunable', 'parameter', 'k', '100', 'Gain of controller', ('controller', 'PI.k')),
@@ -32,23 +32,16 @@ class FMUContainerTest(unittest.TestCase):
                     {
                         'filename': os.path.join(examples, 'Controller.fmu'),  # filename of the FMU
                         'name': 'controller',  # instance name
-                        # 'variables': ['u_s', 'PI.k']  # variables to expose in the container
                     },
                     {
                         'filename': os.path.join(examples, 'Drivetrain.fmu'),
                         'name': 'drivetrain',
-                        # 'variables': ['w']
                     }
                 ],
 
             # connections between the FMU instances
             'connections':
                 [
-                    # <from_instance>, <from_variable>, <to_instance>, <to_variable>
-                    # Connection(None, 'k', 'controller', 'PI.k'),
-                    # Connection(None, 'w_ref', 'controller', 'u_s'),
-                    # Connection('drivetrain', 'w', None, 'w'),
-
                     Connection('drivetrain', 'w', 'controller', 'u_m'),
                     Connection('controller', 'y', 'drivetrain', 'tau'),
                 ]
