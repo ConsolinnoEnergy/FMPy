@@ -21,9 +21,9 @@ class FMUContainerTest(unittest.TestCase):
             # variables of the container
             'variables':
                 [
-                    Variable('Real', 'tunable', 'parameter', 'k', '100', 'Gain of controller', ('controller', 'PI.k')),
-                    Variable('Real', 'continuous', 'input', 'w_ref', '0', 'Reference speed', ('controller', 'u_s')),
-                    Variable('Real', 'continuous', 'output', 'w', None, 'Gain of controller', ('drivetrain', 'w')),
+                    Variable('Real', 'tunable', 'parameter', 'k', '100', 'Gain of controller', [('controller', 'PI.k')]),
+                    Variable('Real', 'continuous', 'input', 'w_ref', '0', 'Reference speed', [('controller', 'u_s')]),
+                    Variable('Real', 'continuous', 'output', 'w', None, 'Gain of controller', [('drivetrain', 'w')]),
                 ],
 
             # models to include in the container

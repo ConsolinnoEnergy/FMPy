@@ -3,7 +3,7 @@ from tempfile import mkdtemp
 
 class Variable:
 
-    def __init__(self, type: str, variability: str, causality: str, name: str, start: str, description: str, mapping: tuple):
+    def __init__(self, type: str, variability: str, causality: str, name: str, start: str, description: str, mapping: list):
 
         self.type = type
         self.variability = variability
@@ -93,12 +93,19 @@ def create_fmu_container(configuration, output_filename):
 
     for i, v in enumerate(configuration['variables']):
 
+        component_indices = []
+        value_references = []
+
         # config.mp
-        component_name, variable_name = v.mapping
-        component_index, component_variables = component_map[component_name]
+        for component_name, variable_name in v.mapping:
+            component_index, component_variables = component_map[component_name]
+            value_reference = component_variables[variable_name].valueReference
+            component_indices.append(component_index)
+            value_references.append(value_reference)
+
         data['variables'].append({
-            'component': component_index,
-            'valueReference': component_variables[variable_name].valueReference
+            'components': component_indices,
+            'valueReferences': value_references
         })
 
         # modelDescription.xml
@@ -138,8 +145,6 @@ def create_fmu_container(configuration, output_filename):
 
 </fmiModelDescription>
 '''
-
-    print(xml)
 
     with open(os.path.join(unzipdir, 'modelDescription.xml'), 'w') as f:
         f.write(xml)
