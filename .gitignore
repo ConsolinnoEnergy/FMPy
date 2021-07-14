@@ -12,6 +12,10 @@
 *.exe
 *.lib
 *.so
+!fmpy/sundials/x86_64-linux/sundials_cvode.so
+!fmpy/sundials/x86_64-linux/sundials_nvecserial.so
+!fmpy/sundials/x86_64-linux/sundials_sunlinsoldense.so
+!fmpy/sundials/x86_64-linux/sundials_sunmatrixdense.so
 
 # source archives
 *.tar.gz
