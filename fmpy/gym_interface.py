@@ -5,6 +5,7 @@ import numpy as np
 import shutil
 
 class FMI_env:
+    relative_tolerance = None
     done = False
     start_values = {}
     _simulation_input = None
@@ -18,7 +19,6 @@ class FMI_env:
     input_names = []
     def __init__(self, fmu_file):
         self.unzipdir = extract(fmu_file)
-
         # read the model description
         self.model_description = read_model_description(self.unzipdir)
         # instantiate the FMU
@@ -132,7 +132,7 @@ class FMI_env:
                 self.unzipdir,
                 start_time=self.start_time,
                 stop_time=self.stop_time,
-                # input = self.simulation_input,
+                input = self.simulation_input,
                 output=self.output,
                 model_description=self.model_description,
                 fmu_instance=self.fmu_instance,
