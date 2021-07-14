@@ -2,6 +2,7 @@
 # *.fmu
 *.ssp
 *.csv
+!fmpy/examples/maggie/Loadprofiles_MAGGIE.csv
 *.html
 
 # binaries
