@@ -158,8 +158,7 @@ class MaggieDiscrete(Maggie):
         action = np.array([np.array(divider * action).sum()],dtype=int)
         return action
         
-
-if __name__ == "__main__":
+def maggie_test():
     maggie = Maggie()
     maggie.reset()
     # maggie.fixed_step = True
@@ -187,7 +186,9 @@ if __name__ == "__main__":
                 print(f"buffer_{i}_high: ", maggie.get_current(f'y__dezPuffer{i}__degC_high'), f"buffer_{i}_low: ", maggie.get_current(f'y__dezPuffer{i}__degC_low'))
             print("buffer_chp_high: ", maggie.get_current('y__Puffer__degC__high__BHKW'), "buffer_chp_low: ", maggie.get_current('y__Puffer__degC__low__BHKW'))
             print("buffer_hp_high: ", maggie.get_current('y__Puffer__degC__high__WP'), "buffer_hp_low: ", maggie.get_current('y__Puffer__degC__low__WP'))
-    
+
+if __name__ == "__main__":
+    maggie_test()
     
 
 
