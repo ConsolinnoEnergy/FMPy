@@ -74,7 +74,7 @@ class JaysPuffer(FMI_env):
         state, reward, done, info = super().step(action)
         self.state_hist.append(state[0])
         return state, reward, done, info 
-        
+
     def reward(self, action, old_state):
         T = self.state[0]
         reward = 0.
@@ -401,7 +401,7 @@ class JaysPuffer(FMI_env):
         super().close
         self.viewer.close()
 
-    def 
+
 
 
         
