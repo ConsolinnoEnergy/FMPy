@@ -25,7 +25,7 @@ _fmu = FMI_env(fmu_file)
 #     ]
 
 
-loads = {'u__demand_th__1__thermal_power_minus__1': [0*10]*10}
+loads = {'u__demand_th__1__thermal_power_minus__1': [10]*24}
 
 
 class JaysPuffer(FMI_env):
@@ -38,7 +38,7 @@ class JaysPuffer(FMI_env):
     T_min = 50.
     T_max = 70.
     _env_name = "Jayspuffer"
-    price = [0.]*2 + [1.]*2 + [0.]*2 + [1]*4
+    price = [0.]*6 + [1.]*6 + [0.]*6 + [1]*6
     statistic_input = loads
     
     def __init__(self):
@@ -81,21 +81,20 @@ class JaysPuffer(FMI_env):
         if T < self.T_min - 10:
             reward -= 100
             self.done = True
-        if T > self.T_min +10:
+        if T > self.T_max +10:
             reward -= 100
             self.done = True
         if (self.T_min - 10) <= T < self.T_min:
             reward -= 10
-        if self.T_max < T < self.T_max + 10:
+        if self.T_max < T <= self.T_max + 10:
             reward -= 10
         if self.failed_simulation:
             reward -= 100
             self.done = True
+        if self.T_min <= T <= self.T_max:
+            reward += self.price[self._counter]
+        return reward
 
-
-
-
-        return 
 
     def _get_action_space(self):
         return spaces.Discrete(2)
