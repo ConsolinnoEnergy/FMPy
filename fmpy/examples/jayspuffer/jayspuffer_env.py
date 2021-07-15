@@ -45,8 +45,8 @@ class JaysPuffer(FMI_env):
         self.action_hist = []
         self.viewer = None
 
-    def _transform_state(self, value: np.array) -> np.array:
-        state = super()._transform_state(value)
+    def transform_state(self, value: np.array) -> np.array:
+        state = super().transform_state(value)
         return np.array([state[0], self.price[self._counter], self.action[0]],dtype = float)
 
     def policy(self):
