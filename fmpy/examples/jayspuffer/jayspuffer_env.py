@@ -74,6 +74,28 @@ class JaysPuffer(FMI_env):
         state, reward, done, info = super().step(action)
         self.state_hist.append(state[0])
         return state, reward, done, info 
+        
+    def reward(self, action, old_state):
+        T = self.state[0]
+        reward = 0.
+        if T < self.T_min - 10:
+            reward -= 100
+            self.done = True
+        if T > self.T_min +10:
+            reward -= 100
+            self.done = True
+        if (self.T_min - 10) <= T < self.T_min:
+            reward -= 10
+        if self.T_max < T < self.T_max + 10:
+            reward -= 10
+        if self.failed_simulation:
+            reward -= 100
+            self.done = True
+
+
+
+
+        return 
 
     def _get_action_space(self):
         return spaces.Discrete(2)
@@ -378,6 +400,8 @@ class JaysPuffer(FMI_env):
     def close(self):
         super().close
         self.viewer.close()
+
+    def 
 
 
         
