@@ -47,7 +47,7 @@ class JaysPuffer(FMI_env):
 
     def transform_state(self, value: np.array) -> np.array:
         state = super().transform_state(value)
-        return np.array([state[0], self.price[self._counter], self.action[0]],dtype = float)
+        return np.array([state[0],state[1], self.price[self._counter], self.action[0]],dtype = float)
 
     def policy(self):
         if self.state[0] < 50:
