@@ -17,6 +17,22 @@ class FMI_env:
     statistic_input = {}
     _counter = 0
     input_names = []
+    solver='CVode'
+    step_size= None
+    relative_tolerance = None
+    output_interval = None
+    record_events=True
+    start_values = {}
+    apply_default_start_values= False
+    timeout= None
+    debug_logging= False
+    visible=False
+    logger= None
+    fmi_call_logger = None
+    step_finished= None
+    set_input_derivatives = False
+
+
     def __init__(self, fmu_file):
         self.unzipdir = extract(fmu_file)
         # read the model description
@@ -136,7 +152,21 @@ class FMI_env:
                 output=self.output,
                 model_description=self.model_description,
                 fmu_instance=self.fmu_instance,
-                initialize=initialize
+                initialize=initialize,
+                solver=self.solver,
+                step_size=self.step_size,
+                relative_tolerance = self.relative_tolerance,
+                output_interval = self.output_interval,
+                record_events=self.record_events,
+                start_values = self.start_values,
+                apply_default_start_values= self.apply_default_start_values,
+                timeout= self.timeout,
+                debug_logging= self.debug_logging,
+                visible=self.visible,
+                logger= self.logger,
+                fmi_call_logger = self.fmi_call_logger,
+                step_finished= self.step_finished,
+                set_input_derivatives = self.set_input_derivatives
                 )
             d = {x : result[x][-1] for x in result.dtype.fields if x!='time'}
             return d

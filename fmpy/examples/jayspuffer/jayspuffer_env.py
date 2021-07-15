@@ -29,6 +29,8 @@ loads = {'u__demand_th__1__thermal_power_minus__1': [0*10]*10}
 
 
 class JaysPuffer(FMI_env):
+    relative_tolerance = 10e-6
+    step_size = 1.
     tau = 60 * 60 # 1 hour
     input_names = ['u__boiler_el__1__electric_power_minus__1', 'u__demand_th__1__thermal_power_minus__1']
     output = ["add5.y"]
@@ -36,7 +38,7 @@ class JaysPuffer(FMI_env):
     T_min = 50.
     T_max = 70.
     _env_name = "Jayspuffer"
-    price = [0.]*2 + [1.]*2 + [0.]*2 + [1]*2
+    price = [0.]*2 + [1.]*2 + [0.]*2 + [1]*4
     statistic_input = loads
     
     def __init__(self):
@@ -63,6 +65,8 @@ class JaysPuffer(FMI_env):
         return state
         
     def step(self, action):
+        if len(action.shape)== 0:
+            action = np.array([action])
         self.action = action
         self.action_hist.append(action)
         if action != np.array([0]):
