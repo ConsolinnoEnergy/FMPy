@@ -25,7 +25,7 @@ _fmu = FMI_env(fmu_file)
 #     ]
 
 
-loads = {'u__demand_th__1__thermal_power_minus__1': [10]*100}
+loads = {'u__demand_th__1__thermal_power_minus__1': [0*10]*10}
 
 
 class JaysPuffer(FMI_env):
