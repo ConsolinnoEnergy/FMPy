@@ -78,21 +78,23 @@ class JaysPuffer(FMI_env):
     def reward(self, action, old_state):
         T = self.state[0]
         reward = 0.
-        if T < self.T_min - 10:
+        if T < (self.T_min - 10):
             reward -= 100
             self.done = True
-        if T > self.T_max +10:
+        if T > (self.T_max + 10):
             reward -= 100
             self.done = True
         if (self.T_min - 10) <= T < self.T_min:
             reward -= 10
-        if self.T_max < T <= self.T_max + 10:
+        if self.T_max < T <= (self.T_max + 10):
             reward -= 10
         if self.failed_simulation:
             reward -= 100
             self.done = True
+        # where we want to be
         if self.T_min <= T <= self.T_max:
             reward += self.price[self._counter]
+
         return reward
 
 
