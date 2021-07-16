@@ -222,7 +222,6 @@ class FMI_env_stable(FMI_env):
                 relative_tolerance = self.relative_tolerance,
                 output_interval = self.output_interval,
                 record_events=self.record_events,
-                start_values = self.start_values,
                 apply_default_start_values= self.apply_default_start_values,
                 timeout= self.timeout,
                 debug_logging= self.debug_logging,
