@@ -186,3 +186,62 @@ class FMI_env:
 
 
 
+
+class FMI_env_stable(FMI_env):
+  
+    start_values = {}
+
+    def reset(self):
+        self.failed_simulation = False
+        self.done = False
+        self._counter = 0
+        self.start_time = 0
+        self.stop_time = 1. # self.tau
+        self.simulation_input= np.array([0.]*(len(self.action_input)),dtype=float)
+        simulation_result = self.do_simulation()
+        self._counter = 1
+        self.state = simulation_result
+        self.start_time = self.stop_time
+        self.stop_time = self.stop_time + self.tau
+        return self.state
+
+    def do_simulation(self):
+        self.fmu_instance.reset()
+        try:
+            result = simulate_fmu(
+                self.unzipdir,
+                start_time=self.start_time,
+                stop_time=self.stop_time,
+                input = self.simulation_input,
+                output=self.output,
+                model_description=self.model_description,
+                fmu_instance=self.fmu_instance,
+                start_values=self.start_values,
+                solver=self.solver,
+                step_size=self.step_size,
+                relative_tolerance = self.relative_tolerance,
+                output_interval = self.output_interval,
+                record_events=self.record_events,
+                start_values = self.start_values,
+                apply_default_start_values= self.apply_default_start_values,
+                timeout= self.timeout,
+                debug_logging= self.debug_logging,
+                visible=self.visible,
+                logger= self.logger,
+                fmi_call_logger = self.fmi_call_logger,
+                step_finished= self.step_finished,
+                set_input_derivatives = self.set_input_derivatives
+                )
+            self.start_values = {x : result[x][-1] for x in result.dtype.fields if x!='time'}
+            return self.start_values
+        except Exception as e:
+            print(repr(e))
+            self.failed_simulation = True
+            return 
+
+    def close(self):
+        self.fmu_instance.freeInstance()
+        # delete the temporary directory
+        shutil.rmtree(self.unzipdir, ignore_errors=True)
+
+   

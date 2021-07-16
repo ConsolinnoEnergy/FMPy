@@ -1,7 +1,7 @@
 from typing import Counter
 
 from numpy.lib.npyio import load
-from fmpy.gym_interface import FMI_env
+from fmpy.gym_interface import FMI_env, FMI_env_stable
 import os
 import time
 import numpy as np
@@ -28,7 +28,7 @@ _fmu = FMI_env(fmu_file)
 loads = {'u__demand_th__1__thermal_power_minus__1': [10]*24}
 
 
-class JaysPuffer(FMI_env):
+class JaysPuffer(FMI_env_stable):
     relative_tolerance = 10e-6
     step_size = 1.
     tau = 60 * 60 # 1 hour
