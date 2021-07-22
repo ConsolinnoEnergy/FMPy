@@ -216,8 +216,6 @@ class FMI_env_stable(FMI_env):
         self.fmu_instance.reset()
         try:
 
-            print("Input: ", self.simulation_input)
-            print("Start values: ", self.start_values)
             result = simulate_fmu(
                 self.unzipdir,
                 start_time=self.start_time,
@@ -241,7 +239,6 @@ class FMI_env_stable(FMI_env):
                 # step_finished= self.step_finished,
                 # set_input_derivatives = self.set_input_derivatives,
                 )
-            print("first: ", result['add5.y'][0],"last: ", result['add5.y'][-1])
             self.start_values = {self.output_to_input(x) : result[x][-1] for x in result.dtype.fields if x!='time'}
             
             return self.start_values

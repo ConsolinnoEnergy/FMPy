@@ -424,16 +424,16 @@ if __name__ == "__main__":
         filename = path + "/KI_im_Puffer.fmu"
     done = False
     fmi=JaysPuffer()
-    vars = fmi.model_description.modelVariables
+    
 
     print("initial state: ", fmi.reset())
     t=time()
     while fmi.done == False:
         action = fmi.policy()
-        print("action: ", action)
+        # print("action: ", action)
         state, reward, done, info = fmi.step(action)
-        print("state: ",state[0])
-        print("done?: ", done)
+        # print("state: ",state[0])
+        # print("done?: ", done)
 
 
     elapsed = time() - t
