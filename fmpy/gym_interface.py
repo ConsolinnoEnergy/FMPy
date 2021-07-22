@@ -1,6 +1,7 @@
+
 from fmpy.model_description import read_model_description
 from fmpy import extract
-from fmpy.simulation import instantiate_fmu, simulate_fmu, Input
+from fmpy.simulation import instantiate_fmu, simulate_fmu, simulate_fmu_new, Input
 import numpy as np
 import shutil
 
@@ -131,7 +132,10 @@ class FMI_env:
                 )
         else:
             signals = np.array(
-                [tuple([self.start_time] + [x for x in self.current_statistic] + [x for x in value])],
+                [
+                    tuple([self.start_time] + [x for x in self.current_statistic] + [x for x in value]),
+                   # tuple([self.stop_time] + [x for x in self.current_statistic] + [x for x in value])
+                    ],
                 dtype = [('time',float)] + [(x,float) for x in self.statistic_input] + [(x,float) for x in self.action_input] 
                 )
         return signals
@@ -144,7 +148,7 @@ class FMI_env:
   
         try:
             initialize = True if self._counter == 0 else False
-            result = simulate_fmu(
+            result = simulate_fmu_new(
                 self.unzipdir,
                 start_time=self.start_time,
                 stop_time=self.stop_time,
@@ -188,9 +192,11 @@ class FMI_env:
 
 
 class FMI_env_stable(FMI_env):
-  
+    
+    
     start_values = {}
-
+    def output_to_input(self,x):
+        return x
     def reset(self):
         self.failed_simulation = False
         self.done = False
@@ -198,6 +204,7 @@ class FMI_env_stable(FMI_env):
         self.start_time = 0
         self.stop_time = 1. # self.tau
         self.simulation_input= np.array([0.]*(len(self.action_input)),dtype=float)
+        self.start_values.update({x : self.simulation_input[x][-1] for x in self.simulation_input.dtype.fields if x!='time'})
         simulation_result = self.do_simulation()
         self._counter = 1
         self.state = simulation_result
@@ -208,6 +215,9 @@ class FMI_env_stable(FMI_env):
     def do_simulation(self):
         self.fmu_instance.reset()
         try:
+
+            print("Input: ", self.simulation_input)
+            print("Start values: ", self.start_values)
             result = simulate_fmu(
                 self.unzipdir,
                 start_time=self.start_time,
@@ -217,27 +227,45 @@ class FMI_env_stable(FMI_env):
                 model_description=self.model_description,
                 fmu_instance=self.fmu_instance,
                 start_values=self.start_values,
-                solver=self.solver,
-                step_size=self.step_size,
-                relative_tolerance = self.relative_tolerance,
-                output_interval = self.output_interval,
-                record_events=self.record_events,
-                apply_default_start_values= self.apply_default_start_values,
-                timeout= self.timeout,
-                debug_logging= self.debug_logging,
-                visible=self.visible,
-                logger= self.logger,
-                fmi_call_logger = self.fmi_call_logger,
-                step_finished= self.step_finished,
-                set_input_derivatives = self.set_input_derivatives
+                # solver=self.solver,
+                # step_size=self.step_size,
+                # relative_tolerance = self.relative_tolerance,
+                # output_interval = self.output_interval,
+                # record_events=self.record_events,
+                # apply_default_start_values= self.apply_default_start_values,
+                # timeout= self.timeout,
+                # debug_logging= self.debug_logging,
+                # visible=self.visible,
+                # logger= self.logger,
+                # fmi_call_logger = self.fmi_call_logger,
+                # step_finished= self.step_finished,
+                # set_input_derivatives = self.set_input_derivatives,
                 )
-            self.start_values = {x : result[x][-1] for x in result.dtype.fields if x!='time'}
+            print("first: ", result['add5.y'][0],"last: ", result['add5.y'][-1])
+            self.start_values = {self.output_to_input(x) : result[x][-1] for x in result.dtype.fields if x!='time'}
+            
             return self.start_values
         except Exception as e:
             print(repr(e))
             self.failed_simulation = True
             return 
+    def step(self, action):
+        self.simulation_input = action
+        self.start_values.update({x : self.simulation_input[x][-1] for x in self.simulation_input.dtype.fields if x!='time'})
+        old_state = self.state
+        simulation_result= self.do_simulation()
+        self.start_time = self.stop_time
+        self.stop_time += self.tau
+        self._counter += 1
+        if self.failed_simulation:
+            self.done = True
+            return self.state, self.reward(action, old_state), self.done, {}
+        if self._counter >= self.end - 1:
+            self.done = True
+        self.state = simulation_result
+        return self.state, self.reward(action, old_state), self.done, {}
 
+       
     def close(self):
         self.fmu_instance.freeInstance()
         # delete the temporary directory

@@ -15,6 +15,14 @@ path = os.path.split(__file__)[0] + "/" if len(os.path.split(__file__)[0]) > 0  
 fmu_file = path + "KI_im_Puffer.fmu"
 
 _fmu = FMI_env(fmu_file)
+
+for var in _fmu.model_description.modelVariables:
+    if var.name == 'u__boiler_el__1__electric_power_minus__1':
+        print(var.name)
+        print(var.description)
+        print(var.unit)
+        print(var.initial)
+
 # _CONF['time_step'] = 60 * 60
 
 # _CONF['model_output_names'] = ["add5.y"]
@@ -25,14 +33,15 @@ _fmu = FMI_env(fmu_file)
 #     ]
 
 
-loads = {'u__demand_th__1__thermal_power_minus__1': [10]*24}
+loads = {'u__demand_th__1__thermal_power_minus__1': [5]*24}
 
 
 class JaysPuffer(FMI_env_stable):
-    relative_tolerance = 10e-6
-    step_size = 1.
+    relative_tolerance = 10e-5
+    # step_size = 1.
     tau = 60 * 60 # 1 hour
     input_names = ['u__boiler_el__1__electric_power_minus__1', 'u__demand_th__1__thermal_power_minus__1']
+    _output_to_input = {'add5.y' : 'init__storage_th__1__tp__mean'}
     output = ["add5.y"]
     action = np.array([0])
     T_min = 50.
@@ -40,7 +49,8 @@ class JaysPuffer(FMI_env_stable):
     _env_name = "Jayspuffer"
     price = [0.]*6 + [1.]*6 + [0.]*6 + [1]*6
     statistic_input = loads
-    
+    def output_to_input(self, x):
+        return self._output_to_input[x]
     def __init__(self):
         super().__init__(fmu_file)
         self.state_hist = []
@@ -70,7 +80,7 @@ class JaysPuffer(FMI_env_stable):
         self.action = action
         self.action_hist.append(action)
         if action != np.array([0]):
-            action = np.array([20.])
+            action = np.array([1.])
         state, reward, done, info = super().step(action)
         self.state_hist.append(state[0])
         return state, reward, done, info 
@@ -422,7 +432,7 @@ if __name__ == "__main__":
         action = fmi.policy()
         print("action: ", action)
         state, reward, done, info = fmi.step(action)
-        print("state: ",state)
+        print("state: ",state[0])
         print("done?: ", done)
 
 
