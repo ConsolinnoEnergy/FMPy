@@ -16,30 +16,13 @@ fmu_file = path + "KI_im_Puffer.fmu"
 
 _fmu = FMI_env(fmu_file)
 
-for var in _fmu.model_description.modelVariables:
-    if var.name == 'u__boiler_el__1__electric_power_minus__1':
-        print(var.name)
-        print(var.description)
-        print(var.unit)
-        print(var.initial)
-
-# _CONF['time_step'] = 60 * 60
-
-# _CONF['model_output_names'] = ["add5.y"]
-
-# _CONF['model_input_names'] = [
-#     'u__demand_th__1__thermal_power_minus__1',
-#     'u__boiler_el__1__electric_power_minus__1'
-#     ]
-
-
 loads = {'u__demand_th__1__thermal_power_minus__1': [5]*24}
 
 
 class JaysPuffer(FMI_env_stable):
-    relative_tolerance = 10e-5
+    # relative_tolerance = 10e-5
     # step_size = 1.
-    tau = 60 * 60 # 1 hour
+    tau = 60 * 10 # 1 hour
     input_names = ['u__boiler_el__1__electric_power_minus__1', 'u__demand_th__1__thermal_power_minus__1']
     _output_to_input = {'add5.y' : 'init__storage_th__1__tp__mean'}
     output = ["add5.y"]
