@@ -198,6 +198,7 @@ class FMI_env_stable(FMI_env):
     def output_to_input(self,x):
         return x
     def reset(self):
+        self.start_values = {}
         self.failed_simulation = False
         self.done = False
         self._counter = 0
