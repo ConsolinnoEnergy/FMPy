@@ -20,8 +20,7 @@ loads = {'u__demand_th__1__thermal_power_minus__1': [5]*24}
 
 
 class JaysPuffer(FMI_env_stable):
-    relative_tolerance = 10e-6
-    output_interval = 10.
+   
     tau = 60 * 10 # 1 hour
     input_names = ['u__boiler_el__1__electric_power_minus__1', 'u__demand_th__1__thermal_power_minus__1']
     _output_to_input = {'add5.y' : 'init__storage_th__1__tp__mean'}
