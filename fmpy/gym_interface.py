@@ -32,14 +32,16 @@ class FMI_env:
     fmi_call_logger = None
     step_finished= None
     set_input_derivatives = False
+    fmi_type = 'ModelExchange'
 
 
-    def __init__(self, fmu_file):
+    def __init__(self, fmu_file, fmi_type = 'ModelExchange'):
+        self.fmi_type = fmi_type
         self.unzipdir = extract(fmu_file)
         # read the model description
         self.model_description = read_model_description(self.unzipdir)
         # instantiate the FMU
-        self.fmu_instance = instantiate_fmu(self.unzipdir, self.model_description, 'ModelExchange')
+        self.fmu_instance = instantiate_fmu(self.unzipdir, self.model_description, self.fmi_type)
         self.observation_space = self._get_observation_space()
         self.action_space = self._get_action_space()
 
@@ -156,6 +158,7 @@ class FMI_env:
                 output=self.output,
                 model_description=self.model_description,
                 fmu_instance=self.fmu_instance,
+                fmi_type=self.fmi_type,
                 initialize=initialize,
                 solver=self.solver,
                 step_size=self.step_size,
@@ -216,7 +219,8 @@ class FMI_env_stable(FMI_env):
     def do_simulation(self):
         self.fmu_instance.reset()
         try:
-
+         
+        
             result = simulate_fmu(
                 self.unzipdir,
                 start_time=self.start_time,
@@ -226,10 +230,11 @@ class FMI_env_stable(FMI_env):
                 model_description=self.model_description,
                 fmu_instance=self.fmu_instance,
                 start_values=self.start_values,
-                # solver=self.solver,
-                # step_size=self.step_size,
-                # relative_tolerance = self.relative_tolerance,
-                # output_interval = self.output_interval,
+                solver=self.solver,
+                fmi_type=self.fmi_type,
+                step_size=self.step_size,
+                relative_tolerance = self.relative_tolerance,
+                output_interval = self.output_interval,
                 # record_events=self.record_events,
                 # apply_default_start_values= self.apply_default_start_values,
                 # timeout= self.timeout,
@@ -240,8 +245,9 @@ class FMI_env_stable(FMI_env):
                 # step_finished= self.step_finished,
                 # set_input_derivatives = self.set_input_derivatives,
                 )
+          
             self.start_values = {self.output_to_input(x) : result[x][-1] for x in result.dtype.fields if x!='time'}
-            
+         
             return self.start_values
         except Exception as e:
             print(repr(e))

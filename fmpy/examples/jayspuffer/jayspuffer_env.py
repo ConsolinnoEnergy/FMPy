@@ -20,8 +20,8 @@ loads = {'u__demand_th__1__thermal_power_minus__1': [5]*24}
 
 
 class JaysPuffer(FMI_env_stable):
-    # relative_tolerance = 10e-5
-    # step_size = 1.
+    relative_tolerance = 10e-6
+    output_interval = 10.
     tau = 60 * 10 # 1 hour
     input_names = ['u__boiler_el__1__electric_power_minus__1', 'u__demand_th__1__thermal_power_minus__1']
     _output_to_input = {'add5.y' : 'init__storage_th__1__tp__mean'}
@@ -34,11 +34,12 @@ class JaysPuffer(FMI_env_stable):
     statistic_input = loads
     def output_to_input(self, x):
         return self._output_to_input[x]
-    def __init__(self):
-        super().__init__(fmu_file)
+    def __init__(self, fmi_type = 'ModelExchange'):
+        super().__init__(fmu_file, fmi_type)
         self.state_hist = []
         self.action_hist = []
         self.viewer = None
+        
 
     def transform_state(self, value: np.array) -> np.array:
         state = super().transform_state(value)
@@ -406,8 +407,8 @@ if __name__ == "__main__":
     else:
         filename = path + "/KI_im_Puffer.fmu"
     done = False
-    fmi=JaysPuffer()
-    
+    fmi=JaysPuffer(fmi_type = 'CoSimulation')
+ 
 
     print("initial state: ", fmi.reset())
     t=time()
@@ -415,7 +416,7 @@ if __name__ == "__main__":
         action = fmi.policy()
         # print("action: ", action)
         state, reward, done, info = fmi.step(action)
-        # print("state: ",state[0])
+        print("state: ",state[0])
         # print("done?: ", done)
 
 

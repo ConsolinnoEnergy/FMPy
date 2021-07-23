@@ -144,15 +144,16 @@ class Recorder(object):
             last = self.rows[-1][0]
             if time - last + eps < self.interval:
                 return
-
         row = [time]
 
         for t in self.types:
             names, vrs, shapes, nValues, getter = self.info[t]
             if self.modelDescription.fmiVersion in ['1.0', '2.0']:
                 values = getter(vr=vrs)
+
             else:
                 values = getter(vr=vrs, nValues=nValues)
+            
             self._append_reshaped(row, values, shapes)
 
         self.rows.append(tuple(row))
@@ -1644,6 +1645,7 @@ def simulateCS(model_description, fmu, start_time, stop_time, relative_tolerance
         input.apply(time)
 
         fmu.doStep(currentCommunicationPoint=time, communicationStepSize=output_interval)
+
 
         if step_finished is not None and not step_finished(time, recorder):
             break
