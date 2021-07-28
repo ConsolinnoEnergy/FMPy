@@ -14,6 +14,7 @@ import pandas as pd
 path = os.path.split(__file__)[0] + "/" if len(os.path.split(__file__)[0]) > 0  else ""
 fmu_file = path + "KI_im_Puffer.fmu"
 
+
 _fmu = FMI_env(fmu_file)
 
 loads = {'u__demand_th__1__thermal_power_minus__1': [5]*24}

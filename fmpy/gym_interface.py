@@ -4,8 +4,9 @@ from fmpy import extract
 from fmpy.simulation import instantiate_fmu, simulate_fmu, simulate_fmu_new, Input
 import numpy as np
 import shutil
-
+import pandas as pd
 class FMI_env:
+
     relative_tolerance = None
     done = False
     start_values = {}
@@ -33,7 +34,7 @@ class FMI_env:
     step_finished= None
     set_input_derivatives = False
     fmi_type = 'ModelExchange'
-
+    _output_to_input = {output : output}
 
     def __init__(self, fmu_file, fmi_type = 'ModelExchange'):
         self.fmi_type = fmi_type
@@ -80,6 +81,10 @@ class FMI_env:
                 return len(self.statistic_input[x])
         else:
             return -1
+    
+    @property
+    def pdstate(self):
+        return pd.DataFrame( np.array([tuple([x for x in self.state])], dtype=[(x,float) for x in self.output] + [(x,float) for x in self.statistic_input]))
 
     def step(self, action):
         self.simulation_input = action
@@ -215,9 +220,12 @@ class FMI_env_stable(FMI_env):
         self.start_time = self.stop_time
         self.stop_time = self.stop_time + self.tau
         return self.state
-
+   
     def do_simulation(self):
         self.fmu_instance.reset()
+      
+
+          
         try:
          
         
@@ -245,10 +253,10 @@ class FMI_env_stable(FMI_env):
                 # step_finished= self.step_finished,
                 # set_input_derivatives = self.set_input_derivatives,
                 )
-          
-            self.start_values = {self.output_to_input(x) : result[x][-1] for x in result.dtype.fields if x!='time'}
-         
-            return self.start_values
+        
+
+            self.start_values = {self.output_to_input(x) : result[x][-1] for x in result.dtype.fields if (x!='time' and x in self._output_to_input.keys())}
+            return {x : result[x][-1] for x in result.dtype.fields if (x!='time')}
         except Exception as e:
             print(repr(e))
             self.failed_simulation = True

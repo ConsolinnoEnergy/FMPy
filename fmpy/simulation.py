@@ -499,7 +499,6 @@ def apply_start_values(fmu, model_description, start_values, apply_default_start
                                     (variable.name, np.prod(variable.shape), len(value)))
         else:
             value = [variable._python_type(value)]
-
         setter([vr], value)
 
     if len(start_values) > 0:
@@ -1351,7 +1350,6 @@ def simulateME(model_description, fmu, start_time, stop_time, solver_name, step_
     input = Input(fmu, model_description, input_signals)
 
     apply_start_values(fmu, model_description, start_values, apply_default_start_values)
-
     # initialize
     if is_fmi1:
 
@@ -1596,7 +1594,6 @@ def simulateME(model_description, fmu, start_time, stop_time, solver_name, step_
 
 
 def simulateCS(model_description, fmu, start_time, stop_time, relative_tolerance, start_values, apply_default_start_values, input_signals, output, output_interval, timeout, step_finished, set_input_derivatives):
-
     if set_input_derivatives and not model_description.coSimulation.canInterpolateInputs:
         raise Exception("Parameter set_input_derivatives is True but the FMU cannot interpolate inputs.")
 
@@ -1623,13 +1620,14 @@ def simulateCS(model_description, fmu, start_time, stop_time, relative_tolerance
         fmu.initialize(tStart=time, stopTime=stop_time)
     elif is_fmi2:
         fmu.enterInitializationMode()
+
+       
         input.apply(time)
         fmu.exitInitializationMode()
     else:
         fmu.enterInitializationMode(tolerance=relative_tolerance, startTime=start_time)
         input.apply(time)
         fmu.exitInitializationMode()
-
     recorder = Recorder(fmu=fmu, modelDescription=model_description, variableNames=output, interval=output_interval)
 
     n_steps = 0
