@@ -37,7 +37,7 @@ class Maggie(FMI_env_stable):
     output = [x.name for x in _fmu.model_description.modelVariables if (x.causality == "output" and 'y__' in x.name)]
     _output_to_input = {
             s.replace("init__", "y__") :s 
-            for s in [x.name for x in _fmu.model_description.modelVariables if ('init__' in 'y__' in x.name)]
+            for s in [x.name for x in _fmu.model_description.modelVariables if ('init__'  in x.name)]
         }
     input_names = [x.name for x in _fmu.model_description.modelVariables if (x.causality == "input" and 'u__' in x.name)]
     statistic_input = loads
@@ -181,12 +181,25 @@ def maggie_test():
         print("--------------------------------------")
         action = maggie.policy_simple()
         observation, reward, done, info = maggie.step(action)
-        d = pd.concat([d,maggie.pdstate])
+        a = maggie.pdstate
+        print("state---------------------------------")
+        print(a[maggie._output_to_input.keys()])
+        d = pd.concat([d,a])
     
     d.to_csv("maggie_env_stable_test.csv")
 if __name__ == "__main__":
     maggie_test()
+    # for vr in _fmu.model_description.modelVariables:
+    #     if 'init__' in vr.name:
+    #         print(vr)
     
+    # for vr in _fmu.model_description.modelVariables:
+    #     if 'y__storage' in vr.name:
+    #         print(vr)
+    
+
+    # maggie = Maggie()
+    # print(maggie._output_to_input)
 
 
 
